@@ -12,16 +12,8 @@ import * as Type from "../../store/actions";
 
 import axios from "../../axios-orders";
 
-const INGREDIENT_PRICES = {
-    salad: 0.5,
-    cheese: 1,
-    meat: 1.5,
-    bacon: 0.7
-};
-
 class BurgerBuilder extends Component {
     state = {
-        purchasable: false,
         purchasing: false,
         loading: false,
         error: false
@@ -46,41 +38,7 @@ class BurgerBuilder extends Component {
             .reduce((sum, el) => {
                 return sum + el;
             }, 0);
-        this.setState({ purchasable: sum > 0 });
-    };
-
-    addIngredientHandler = type => {
-        const oldCount = this.props.ingredients[type];
-        const updatedCount = oldCount + 1;
-        const updatedIngredient = { ...this.props.ingredients };
-        updatedIngredient[type] = updatedCount;
-
-        const priceAddition = INGREDIENT_PRICES[type];
-        const oldPrice = this.state.totalPrice;
-        const newPrice = oldPrice + priceAddition;
-
-        this.setState({ ingredients: updatedIngredient, totalPrice: newPrice });
-        this.updatePurchaseState(updatedIngredient);
-    };
-
-    removeIngredientHandler = type => {
-        const oldCount = this.props.ingredients[type];
-        if (oldCount <= 0) {
-            return;
-        }
-        const updatedCount = oldCount - 1;
-        const updatedIngredient = { ...this.props.ingredients };
-        updatedIngredient[type] = updatedCount;
-
-        const priceDeduction = INGREDIENT_PRICES[type];
-        const oldPrice = this.state.totalPrice;
-        if (oldPrice <= 4) {
-            return;
-        }
-        const newPrice = oldPrice - priceDeduction;
-
-        this.setState({ ingredients: updatedIngredient, totalPrice: newPrice });
-        this.updatePurchaseState(updatedIngredient);
+        return sum > 0;
     };
 
     purchaseHandler = () => {
@@ -130,7 +88,9 @@ class BurgerBuilder extends Component {
                         ingredientAdded={this.props.onIngredientAdded}
                         ingredientRemoved={this.props.onIngredientRemoved}
                         disabled={disabledInfo}
-                        purchasable={this.state.purchasable}
+                        purchasable={this.updatePurchaseState(
+                            this.props.ingredients
+                        )}
                         purchasing={this.purchaseHandler}
                         price={this.props.totalPrice}
                     />
