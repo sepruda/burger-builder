@@ -1,4 +1,5 @@
 import * as Type from "../actions/actionTypes";
+import { updateObject } from "../utility";
 
 const initialState = {
   ingredients: null,
@@ -13,40 +14,43 @@ const INGREDIENT_PRICES = {
   bacon: 0.7
 };
 
+const addIngredient = (state, action) => {
+  return {
+    ...state,
+    ingredients: {
+      ...state.ingredients,
+      [action.ingredientName]: state.ingredients[action.ingredientName] + 1
+    },
+    totalPrice: state.totalPrice + INGREDIENT_PRICES[action.ingredientName]
+  };
+};
+
+const removeIngredient = (state, action) => {
+  return {
+    ...state,
+    ingredients: {
+      ...state.ingredients,
+      [action.ingredientName]: state.ingredients[action.ingredientName] - 1
+    },
+    totalPrice: state.totalPrice - INGREDIENT_PRICES[action.name]
+  };
+};
+
+const setIngredients = (state, action) => {
+  return updateObject(state, {
+    ingredients: action.ingredients,
+    error: false,
+    totalPrice: 4
+  });
+};
+// prettier-ignore
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case Type.ADD_INGREDIENT:
-      return {
-        ...state,
-        ingredients: {
-          ...state.ingredients,
-          [action.ingredientName]: state.ingredients[action.ingredientName] + 1
-        },
-        totalPrice: state.totalPrice + INGREDIENT_PRICES[action.ingredientName]
-      };
-    case Type.REMOVE_INGREDIENT:
-      return {
-        ...state,
-        ingredients: {
-          ...state.ingredients,
-          [action.ingredientName]: state.ingredients[action.ingredientName] - 1
-        },
-        totalPrice: state.totalPrice - INGREDIENT_PRICES[action.name]
-      };
-    case Type.SET_INGREDIENTS:
-      return {
-        ...state,
-        ingredients: action.ingredients,
-        error: false,
-        totalPrice: 4
-      };
-    case Type.FETCH_INGREDIENTS_FAILED:
-      return {
-        ...state,
-        error: true
-      };
-    default:
-      return state;
+    case Type.ADD_INGREDIENT: return addIngredient(state, action);
+    case Type.REMOVE_INGREDIENT: return removeIngredient(state, action);
+    case Type.SET_INGREDIENTS: return setIngredients(state, action);
+    case Type.FETCH_INGREDIENTS_FAILED: return updateObject(state, { error: true });
+    default: return state;
   }
 };
 
