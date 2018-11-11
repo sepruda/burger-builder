@@ -34,9 +34,6 @@ export const purchaseBurger = (orderData, token) => {
     axios
       .post("/orders.json?auth=" + token, orderData)
       .then(response => {
-        console.log(orderData);
-
-        console.log(response.data);
         dispatch(purchaseBurgerSucces(response.data.name, orderData));
       })
       .catch(error => {
